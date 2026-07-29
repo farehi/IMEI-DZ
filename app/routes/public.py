@@ -15,7 +15,7 @@ public_bp = Blueprint("public", __name__)
 @public_bp.route("/")
 def index():
     total = Report.query.filter(Report.deleted_at.is_(None), Report.status == "approved").count()
-    searches = SearchLog.query.count()
+    searches = db.session.query(SearchLog).count()
     return render_template("index.html", total_reports=total, total_searches=searches)
 
 
