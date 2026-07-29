@@ -56,7 +56,8 @@ class SearchLog(db.Model):
     __tablename__ = "search_logs"
 
     id = db.Column(db.Integer, primary_key=True)
-    query = db.Column(db.String(50), nullable=False, index=True)
+    # تم تغيير اسم الحقل من query إلى search_query لتجنب التعارض
+    search_query = db.Column(db.String(50), nullable=False, index=True)
     result = db.Column(db.String(20), nullable=False)
     ip_address = db.Column(db.String(45), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
