@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}تم إرسال البلاغ{% endblock %}
+
+{% block content %}
+<div class="text-center py-4">
+    <div class="mb-3">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+    </div>
+    <h1 class="page-title">تم إرسال البلاغ بنجاح</h1>
+    <p class="page-subtitle">سيتم مراجعة البلاغ من قبل المشرفين قريبًا</p>
+
+    <div class="card card-custom p-3 mt-3 text-start">
+        <p class="mb-2"><strong>الرقم المرجعي:</strong></p>
+        <p class="fs-4 fw-bold text-center" style="color: var(--primary); letter-spacing: 1px;">{{ report.reference }}</p>
+        <hr>
+        <p class="mb-1 small"><strong>IMEI:</strong> {{ report.imei1 }}</p>
+        <p class="mb-1 small"><strong>الشركة / الموديل:</strong> {{ report.brand }} / {{ report.model }}</p>
+        <p class="mb-0 small text-muted">احفظ الرقم المرجعي لمتابعة الحالة من صفحة «متابعة»</p>
+    </div>
+
+    <a href="{{ url_for('public.track_report', ref=report.reference) }}" class="btn btn-primary-custom mt-3 w-100">متابعة حالة البلاغ</a>
+    <a href="{{ url_for('public.index') }}" class="btn btn-outline-secondary mt-2 w-100" style="border-radius:10px;">العودة للرئيسية</a>
+</div>
+{% endblock %}

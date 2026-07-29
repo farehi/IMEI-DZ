@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}مدقق الهواتف المسروقة{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root, [data-theme="light"] {
+            --primary: #0d5c4d;
+            --primary-dark: #0a463b;
+            --bg: #f5f7f6;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --border: #dde3e0;
+            --nav-bg: #ffffff;
+        }
+        [data-theme="dark"] {
+            --primary: #1a9b80;
+            --primary-dark: #148a70;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e8e8e8;
+            --text-muted: #aaa;
+            --border: #333;
+            --nav-bg: #1e1e1e;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .navbar-custom {
+            background: var(--primary) !important;
+            padding: 0.75rem 1rem;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link { color: #fff !important; font-weight: 600; }
+        .btn-primary-custom {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 600;
+        }
+        .btn-primary-custom:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: #fff;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            background: var(--card-bg);
+            color: var(--text);
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(13,92,77,0.15);
+            background: var(--card-bg);
+            color: var(--text);
+        }
+        .form-label { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+        .required::after { content: " *"; color: #dc3545; }
+        .alert-info-custom {
+            background: #e8f5f1;
+            border: 1px solid #b8e0d4;
+            border-radius: 12px;
+            color: #0d5c4d;
+            font-size: 0.9rem;
+        }
+        [data-theme="dark"] .alert-info-custom {
+            background: #1a3a32;
+            border-color: #2a5a4a;
+            color: #8fd4c0;
+        }
+        .stat-card {
+            border-radius: 14px;
+            padding: 1rem;
+            text-align: center;
+            background: var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-card .number { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+        .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--nav-bg);
+            border-top: 1px solid var(--border);
+            padding: 8px 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+        }
+        .bottom-nav a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+            flex: 1;
+        }
+        .bottom-nav a.active, .bottom-nav a:hover { color: var(--primary); }
+        .bottom-nav i { font-size: 1.3rem; display: block; }
+        .flash-messages {
+            position: fixed; top: 60px; left: 12px; right: 12px; z-index: 1050;
+        }
+        .page-title { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+        .page-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+        .loading-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.35); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .loading-overlay.show { display: flex; }
+        .spinner-border-custom { width: 3rem; height: 3rem; color: var(--primary); }
+        .list-group-item { background: var(--card-bg); color: var(--text); border-color: var(--border); }
+        .card-header { background: var(--card-bg) !important; color: var(--text); border-color: var(--border); }
+        .theme-toggle {
+            background: transparent; border: none; color: #fff; font-size: 1.2rem; padding: 0 8px;
+        }
+        .text-muted { color: var(--text-muted) !important; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-custom sticky-top">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('public.index') }}">
+                <i class="bi bi-shield-check"></i>
+                <span>مدقق الهواتف المسروقة</span>
+            </a>
+            <div class="d-flex align-items-center">
+                <button class="theme-toggle" id="themeToggle" type="button" title="وضع ليلي">
+                    <i class="bi bi-moon-stars" id="themeIcon"></i>
+                </button>
+                {% block nav_extra %}{% endblock %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border spinner-border-custom" role="status"></div>
+    </div>
+
+    <main class="container py-3">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block bottom_nav %}
+    <div class="bottom-nav">
+        <a href="{{ url_for('public.index') }}" class="{% if request.endpoint == 'public.index' %}active{% endif %}">
+            <i class="bi bi-house"></i> الرئيسية
+        </a>
+        <a href="{{ url_for('public.check_phone') }}" class="{% if request.endpoint == 'public.check_phone' %}active{% endif %}">
+            <i class="bi bi-search"></i> فحص
+        </a>
+        <a href="{{ url_for('public.report_stolen') }}" class="{% if request.endpoint == 'public.report_stolen' %}active{% endif %}">
+            <i class="bi bi-exclamation-triangle"></i> إبلاغ
+        </a>
+        <a href="{{ url_for('public.track_report') }}" class="{% if request.endpoint == 'public.track_report' %}active{% endif %}">
+            <i class="bi bi-clipboard-check"></i> متابعة
+        </a>
+        <a href="{{ url_for('contact.delete_request') }}" class="{% if request.endpoint == 'contact.delete_request' %}active{% endif %}">
+            <i class="bi bi-trash"></i> حذف
+        </a>
+    </div>
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme
+        (function() {
+            const saved = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = saved === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            document.getElementById('themeToggle')?.addEventListener('click', () => {
+                const cur = document.documentElement.getAttribute('data-theme');
+                const next = cur === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                icon.className = next === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            });
+        })();
+        // Loading
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', () => {
+                document.getElementById('loadingOverlay')?.classList.add('show');
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

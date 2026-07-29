@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}متابعة بلاغ{% endblock %}
+
+{% block content %}
+<div class="text-center mb-3">
+    <h1 class="page-title"><i class="bi bi-clipboard-check"></i> متابعة حالة البلاغ</h1>
+    <p class="page-subtitle">أدخل الرقم المرجعي الذي حصلت عليه عند الإبلاغ (مثال: DZ-2026-000001)</p>
+</div>
+
+<div class="card card-custom p-3 mb-3">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label class="form-label required">الرقم المرجعي</label>
+            <input type="text" name="reference" class="form-control" placeholder="DZ-2026-000001"
+                   value="{{ ref }}" required style="text-transform: uppercase; letter-spacing: 1px;">
+        </div>
+        <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="bi bi-search me-1"></i> استعلام
+        </button>
+    </form>
+</div>
+
+{% if report %}
+<div class="card card-custom p-3">
+    <div class="text-center mb-3">
+        {% if report.status == 'pending' %}
+            <i class="bi bi-hourglass-split text-warning" style="font-size: 2.5rem;"></i>
+            <h5 class="text-warning mt-2">قيد المراجعة</h5>
+        {% elif report.status == 'approved' %}
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 2.5rem;"></i>
+            <h5 class="text-success mt-2">مقبول — مسجل كمسروق</h5>
+        {% elif report.status == 'rejected' %}
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 2.5rem;"></i>
+            <h5 class="text-danger mt-2">مرفوض</h5>
+        {% else %}
+            <h5>{{ report.status }}</h5>
+        {% endif %}
+    </div>
+    <hr>
+    <p class="mb-1 small"><strong>الرقم المرجعي:</strong> {{ report.reference }}</p>
+    <p class="mb-1 small"><strong>IMEI:</strong> {{ report.imei1 }}</p>
+    <p class="mb-1 small"><strong>الجهاز:</strong> {{ report.brand }} {{ report.model }}</p>
+    <p class="mb-0 small"><strong>تاريخ الإرسال:</strong> {{ report.created_at.strftime('%Y-%m-%d %H:%M') if report.created_at else '-' }}</p>
+    {% if report.status == 'rejected' and report.admin_notes %}
+    <p class="mt-2 small text-muted"><strong>ملاحظة:</strong> {{ report.admin_notes }}</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

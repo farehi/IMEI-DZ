@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}فحص هاتف{% endblock %}
+
+{% block content %}
+<div class="text-center mb-3">
+    <div class="mb-2">
+        <i class="bi bi-shield-check" style="font-size: 2.5rem; color: var(--primary);"></i>
+    </div>
+    <h1 class="page-title">التحقق من حالة الهاتف</h1>
+    <p class="page-subtitle">أدخل رقم IMEI المكون من 15 رقمًا للتحقق قبل الشراء</p>
+</div>
+
+<div class="card card-custom p-3 mb-4">
+    <form method="POST" action="{{ url_for('public.check_phone') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label class="form-label required">رقم IMEI أو S/N</label>
+            <div class="input-group">
+                <input type="text" name="imei" class="form-control" placeholder="مثال: 351000000000000"
+                       value="{{ query }}" maxlength="20" inputmode="numeric" required autofocus>
+                <button class="btn btn-primary-custom" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+            <div class="form-text">اضغط *#06# على الهاتف لعرض IMEI</div>
+        </div>
+        <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="bi bi-search me-1"></i> تحقق من حالة الهاتف الآن
+        </button>
+    </form>
+</div>
+
+{% if result %}
+<div class="card card-custom p-4 mb-3">
+    {% if result.found %}
+    <div class="text-center">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+        <h4 class="text-danger fw-bold mt-2">هاتف مسروق / مبلغ عنه</h4>
+        <p class="text-muted small mb-3">هذا الجهاز مسجل في قاعدة البيانات كمسروق</p>
+        <div class="text-start small bg-danger bg-opacity-10 rounded p-3">
+            <p class="mb-1"><strong>الرقم المرجعي:</strong> {{ result.report.reference }}</p>
+            <p class="mb-1"><strong>الشركة:</strong> {{ result.report.brand }}</p>
+            <p class="mb-1"><strong>الموديل:</strong> {{ result.report.model }}</p>
+            {% if result.report.color %}<p class="mb-1"><strong>اللون:</strong> {{ result.report.color }}</p>{% endif %}
+            {% if result.report.theft_location %}<p class="mb-1"><strong>مكان السرقة:</strong> {{ result.report.theft_location }}</p>{% endif %}
+            <p class="mb-0"><strong>تاريخ البلاغ:</strong> {{ result.report.created_at.strftime('%Y-%m-%d') if result.report.created_at else '-' }}</p>
+        </div>
+        <a href="{{ url_for('public.report_public_detail', ref=result.report.reference) }}" class="btn btn-outline-danger btn-sm mt-3">عرض التفاصيل</a>
+    </div>
+    {% else %}
+    <div class="text-center">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        <h4 class="text-success fw-bold mt-2">الهاتف نظيف</h4>
+        <p class="text-muted small mb-0">لا يوجد بلاغ مسجل لهذا الرقم في قاعدة البيانات</p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}الرئيسية - مدقق الهواتف المسروقة{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4 mt-2">
+    <div class="mb-3">
+        <i class="bi bi-shield-check" style="font-size: 3rem; color: var(--primary);"></i>
+    </div>
+    <h1 class="page-title">مدقق الهواتف المسروقة</h1>
+    <p class="page-subtitle">تحقق من حالة هاتفك قبل الشراء أو أبلغ عن جهاز مسروق</p>
+</div>
+
+<div class="d-grid gap-3 mb-4">
+    <a href="{{ url_for('public.check_phone') }}" class="btn btn-primary-custom btn-lg">
+        <i class="bi bi-search me-2"></i> فحص هاتف
+    </a>
+    <a href="{{ url_for('public.report_stolen') }}" class="btn btn-outline-secondary btn-lg" style="border-radius: 10px; border-color: var(--primary); color: var(--primary);">
+        <i class="bi bi-exclamation-triangle me-2"></i> الإبلاغ عن هاتف مسروق
+    </a>
+    <a href="{{ url_for('public.track_report') }}" class="btn btn-outline-secondary btn-lg" style="border-radius: 10px;">
+        <i class="bi bi-clipboard-check me-2"></i> متابعة بلاغ
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-4">
+        <div class="stat-card">
+            <div class="number"><i class="bi bi-database-check" style="color: var(--primary);"></i></div>
+            <div class="label">قاعدة نشطة</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="stat-card">
+            <div class="number">{{ total_searches }}</div>
+            <div class="label">عمليات البحث</div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="stat-card">
+            <div class="number">{{ total_reports }}</div>
+            <div class="label">بلاغات معتمدة</div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-custom p-3">
+    <h6 class="fw-bold mb-2"><i class="bi bi-info-circle me-1"></i> كيف يعمل؟</h6>
+    <ol class="mb-0 small text-muted pe-3">
+        <li class="mb-1">أدخل رقم IMEI (15 رقمًا) أو الرقم التسلسلي</li>
+        <li class="mb-1">اضغط على زر التحقق</li>
+        <li class="mb-1">ستظهر لك حالة الجهاز فورًا</li>
+    </ol>
+</div>
+{% endblock %}
