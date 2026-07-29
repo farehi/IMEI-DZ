@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}طلبات الحذف{% endblock %}
+{% block bottom_nav %}{% endblock %}
+{% block nav_extra %}
+<a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-3">طلبات حذف البلاغات</h1>
+
+<div class="mb-3">
+    <a href="?status=pending" class="btn btn-sm {% if status == 'pending' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">معلقة</a>
+    <a href="?status=approved" class="btn btn-sm {% if status == 'approved' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">مقبولة</a>
+    <a href="?status=rejected" class="btn btn-sm {% if status == 'rejected' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">مرفوضة</a>
+</div>
+
+{% for req in requests %}
+<div class="card card-custom p-3 mb-3">
+    <div class="d-flex justify-content-between mb-2">
+        <strong>{{ req.full_name }}</strong>
+        <span class="badge text-bg-secondary">{{ req.status }}</span>
+    </div>
+    <p class="small mb-1"><strong>التواصل:</strong> {{ req.contact }}</p>
+    <p class="small mb-1"><strong>IMEI/S/N:</strong> {{ req.imei_or_sn }}</p>
+    <p class="small mb-2"><strong>السبب:</strong> {{ req.reason }}</p>
+    {% for a in req.attachments %}
+    <a href="{{ url_for('files.serve_upload', filename=a.filename) }}" target="_blank" class="small d-block">
+        <i class="bi bi-file-earmark"></i> {{ a.original_name or a.filename }}
+    </a>
+    {% endfor %}
+    {% if req.status == 'pending' %}
+    <form method="POST" action="{{ url_for('admin.process_delete_request', req_id=req.id) }}" class="mt-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="admin_notes" class="form-control form-control-sm mb-2" placeholder="ملاحظات..."></textarea>
+        <div class="d-flex gap-2">
+            <button type="submit" name="action" value="approve" class="btn btn-success btn-sm flex-fill">قبول وحذف</button>
+            <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm flex-fill">رفض</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+{% else %}
+<div class="text-muted text-center py-4">لا توجد طلبات</div>
+{% endfor %}
+{% endblock %}

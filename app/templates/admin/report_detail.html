@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}تفاصيل البلاغ{% endblock %}
+{% block bottom_nav %}{% endblock %}
+{% block nav_extra %}
+<a class="nav-link" href="{{ url_for('admin.reports') }}"><i class="bi bi-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-1">{{ report.reference }}</h1>
+<p class="text-muted small mb-3">
+    <span class="badge {% if report.status == 'pending' %}text-bg-warning{% elif report.status == 'approved' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ report.status }}</span>
+</p>
+
+<div class="card card-custom p-3 mb-3">
+    <h6 class="fw-bold">بيانات الجهاز</h6>
+    <p class="mb-1 small"><strong>IMEI 1:</strong> {{ report.imei1 }}</p>
+    {% if report.imei2 %}<p class="mb-1 small"><strong>IMEI 2:</strong> {{ report.imei2 }}</p>{% endif %}
+    {% if report.serial_number %}<p class="mb-1 small"><strong>S/N:</strong> {{ report.serial_number }}</p>{% endif %}
+    <p class="mb-1 small"><strong>الشركة:</strong> {{ report.brand }}</p>
+    <p class="mb-1 small"><strong>الموديل:</strong> {{ report.model }}</p>
+    {% if report.color %}<p class="mb-1 small"><strong>اللون:</strong> {{ report.color }}</p>{% endif %}
+    {% if report.theft_date %}<p class="mb-1 small"><strong>تاريخ السرقة:</strong> {{ report.theft_date }}</p>{% endif %}
+    {% if report.theft_location %}<p class="mb-0 small"><strong>المكان:</strong> {{ report.theft_location }}</p>{% endif %}
+</div>
+
+<div class="card card-custom p-3 mb-3">
+    <h6 class="fw-bold">المالك (مفكوك التشفير)</h6>
+    <p class="mb-1 small"><strong>الاسم:</strong> {{ owner_name }}</p>
+    <p class="mb-1 small"><strong>الهاتف:</strong> {{ owner_phone }}</p>
+    {% if report.incident_details %}<p class="mb-0 small"><strong>التفاصيل:</strong> {{ report.incident_details }}</p>{% endif %}
+</div>
+
+{% if attachments %}
+<div class="card card-custom p-3 mb-3">
+    <h6 class="fw-bold">المرفقات</h6>
+    {% for a in attachments %}
+    <a href="{{ url_for('files.serve_upload', filename=a.filename) }}" target="_blank" class="d-block small mb-1">
+        <i class="bi bi-file-earmark"></i> {{ a.original_name or a.filename }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card card-custom p-3">
+    <h6 class="fw-bold mb-3">إجراءات</h6>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label class="form-label">ملاحظات المشرف</label>
+            <textarea name="admin_notes" class="form-control" rows="2">{{ report.admin_notes or '' }}</textarea>
+        </div>
+        <div class="d-grid gap-2">
+            {% if report.status == 'pending' and session.get('admin_role') != 'viewer' %}
+            <button type="submit" name="action" value="approve" class="btn btn-success">قبول البلاغ</button>
+            <button type="submit" name="action" value="reject" class="btn btn-outline-danger">رفض البلاغ</button>
+            {% endif %}
+            <button type="submit" name="action" value="update_notes" class="btn btn-outline-secondary">تحديث الملاحظات</button>
+            {% if session.get('admin_role') != 'viewer' %}
+            <button type="submit" name="action" value="delete" class="btn btn-outline-danger" onclick="return confirm('تأكيد الحذف المنطقي؟')">حذف منطقي</button>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

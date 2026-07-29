@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}دخول المشرف{% endblock %}
+{% block bottom_nav %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-11 col-md-5">
+        <div class="card card-custom p-4">
+            <div class="text-center mb-4">
+                <i class="bi bi-shield-lock" style="font-size: 2.5rem; color: var(--primary);"></i>
+                <h4 class="mt-2 fw-bold">لوحة الإدارة</h4>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-3">
+                    <label class="form-label">اسم المستخدم</label>
+                    <input type="text" name="username" class="form-control" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100">دخول</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

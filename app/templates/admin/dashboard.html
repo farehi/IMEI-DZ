@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block bottom_nav %}{% endblock %}
+
+{% block nav_extra %}
+<a class="nav-link" href="{{ url_for('admin.logout') }}"><i class="bi bi-box-arrow-left"></i></a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-3">لوحة التحكم</h1>
+
+<div class="row g-2 mb-4">
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="number">{{ total }}</div><div class="label">إجمالي البلاغات</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="number text-warning">{{ pending }}</div><div class="label">قيد المراجعة</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="number text-success">{{ approved }}</div><div class="label">مقبولة</div></div></div>
+    <div class="col-6 col-md-3"><div class="stat-card"><div class="number text-danger">{{ rejected }}</div><div class="label">مرفوضة</div></div></div>
+</div>
+
+<div class="row g-2 mb-4">
+    <div class="col-4"><div class="stat-card"><div class="number">{{ delete_reqs }}</div><div class="label">طلبات حذف</div></div></div>
+    <div class="col-4"><div class="stat-card"><div class="number">{{ searches_today }}</div><div class="label">بحث اليوم</div></div></div>
+    <div class="col-4"><div class="stat-card"><div class="number text-danger">{{ failed_logins_today }}</div><div class="label">دخول فاشل</div></div></div>
+</div>
+
+<div class="card card-custom p-3 mb-3">
+    <h6 class="fw-bold mb-2">البلاغات — آخر 7 أيام</h6>
+    <canvas id="chartReports" height="120"></canvas>
+</div>
+
+{% if by_location %}
+<div class="card card-custom p-3 mb-3">
+    <h6 class="fw-bold mb-2">أكثر الولايات بلاغًا</h6>
+    {% for loc, cnt in by_location %}
+    <div class="d-flex justify-content-between small mb-1">
+        <span>{{ loc }}</span>
+        <strong>{{ cnt }}</strong>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a href="{{ url_for('admin.reports') }}" class="btn btn-primary-custom btn-sm">البلاغات</a>
+    <a href="{{ url_for('admin.delete_requests') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">طلبات الحذف</a>
+    <a href="{{ url_for('admin.audit') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">سجل العمليات</a>
+    <a href="{{ url_for('admin.export') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">تصدير CSV</a>
+    {% if session.get('admin_role') == 'superadmin' %}
+    <a href="{{ url_for('admin.failed_logins') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">دخول فاشل</a>
+    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">المشرفون</a>
+    {% endif %}
+</div>
+
+<div class="card card-custom">
+    <div class="card-header fw-bold">آخر البلاغات</div>
+    <div class="list-group list-group-flush">
+        {% for r in recent %}
+        <a href="{{ url_for('admin.report_detail', report_id=r.id) }}" class="list-group-item list-group-item-action">
+            <div class="d-flex justify-content-between">
+                <strong>{{ r.reference }}</strong>
+                <span class="badge {% if r.status == 'pending' %}text-bg-warning{% elif r.status == 'approved' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ r.status }}</span>
+            </div>
+            <small class="text-muted">{{ r.brand }} {{ r.model }} — {{ r.imei1 }}</small>
+        </a>
+        {% else %}
+        <div class="list-group-item text-muted">لا توجد بلاغات</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+new Chart(document.getElementById('chartReports'), {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|tojson }},
+        datasets: [{
+            label: 'بلاغات',
+            data: {{ chart_counts|tojson }},
+            backgroundColor: '#0d5c4d',
+            borderRadius: 6
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+});
+</script>
+{% endblock %}

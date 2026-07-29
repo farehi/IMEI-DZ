@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}محاولات الدخول الفاشلة{% endblock %}
+{% block bottom_nav %}{% endblock %}
+{% block nav_extra %}
+<a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-3">محاولات الدخول الفاشلة</h1>
+<div class="list-group">
+    {% for log in logs %}
+    <div class="list-group-item">
+        <div class="d-flex justify-content-between">
+            <strong>{{ log.username or '-' }}</strong>
+            <small class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '' }}</small>
+        </div>
+        <small class="text-muted">IP: {{ log.ip_address }} — {{ log.user_agent[:60] if log.user_agent else '' }}</small>
+    </div>
+    {% else %}
+    <div class="list-group-item text-muted">لا توجد سجلات</div>
+    {% endfor %}
+</div>
+{% endblock %}

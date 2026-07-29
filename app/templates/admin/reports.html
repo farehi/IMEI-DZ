@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}إدارة البلاغات{% endblock %}
+{% block bottom_nav %}{% endblock %}
+{% block nav_extra %}
+<a class="nav-link" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-arrow-right"></i></a>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title mb-3">البلاغات</h1>
+
+<form method="GET" class="mb-3">
+    <div class="row g-2">
+        <div class="col-6">
+            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="all" {% if status == 'all' %}selected{% endif %}>الكل</option>
+                <option value="pending" {% if status == 'pending' %}selected{% endif %}>قيد المراجعة</option>
+                <option value="approved" {% if status == 'approved' %}selected{% endif %}>مقبولة</option>
+                <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>مرفوضة</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="بحث (مرجع/IMEI)..." value="{{ q }}">
+        </div>
+        <div class="col-6">
+            <input type="text" name="brand" class="form-control form-control-sm" placeholder="الشركة..." value="{{ brand }}">
+        </div>
+        <div class="col-6">
+            <input type="text" name="location" class="form-control form-control-sm" placeholder="الولاية..." value="{{ location }}">
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary-custom btn-sm w-100 mt-2">تصفية</button>
+</form>
+
+<div class="mb-2">
+    <a href="{{ url_for('admin.export', status=status) }}" class="btn btn-sm btn-outline-success">تصدير CSV</a>
+</div>
+
+<div class="list-group">
+    {% for r in reports %}
+    <a href="{{ url_for('admin.report_detail', report_id=r.id) }}" class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ r.reference }}</strong><br>
+                <small class="text-muted">{{ r.brand }} {{ r.model }}</small>
+            </div>
+            <span class="badge {% if r.status == 'pending' %}text-bg-warning{% elif r.status == 'approved' %}text-bg-success{% else %}text-bg-secondary{% endif %}">{{ r.status }}</span>
+        </div>
+        <small class="text-muted">{{ r.imei1 }} — {{ r.created_at.strftime('%Y-%m-%d') if r.created_at else '' }}</small>
+    </a>
+    {% else %}
+    <div class="list-group-item text-muted">لا توجد نتائج</div>
+    {% endfor %}
+</div>
+{% endblock %}
